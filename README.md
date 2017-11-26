@@ -1,0 +1,1 @@
+This Git repository contains source code for Getting started with Spring Framework, 4th Edition book.
