@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<import resource="bankapp-dao.xml" />
+	<import resource="bankapp-service.xml" />
+
+	<bean id="controller"
+		class="sample.spring.chapter03.bankapp.controller.FixedDepositControllerImpl">
+		<property name="fixedDepositService" ref="service" />
+	</bean>
+</beans>

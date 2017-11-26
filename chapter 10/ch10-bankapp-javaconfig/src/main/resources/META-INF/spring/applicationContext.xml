@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:amq="http://activemq.apache.org/schema/core" xmlns:jms="http://www.springframework.org/schema/jms"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd  http://www.springframework.org/schema/tx
+         http://www.springframework.org/schema/tx/spring-tx.xsd 
+         http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd   
+         http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
+         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+
+	<tx:annotation-driven />
+
+	<!-- Configure JMS destination queues -->
+	<amq:queue id="fixedDepositDestination" physicalName="aQueueDestination" />
+	<amq:queue id="emailQueueDestination" physicalName="emailQueueDestination" />
+
+	<bean id="fixedDepositProcessorJob"
+		class="sample.spring.chapter10.bankapp.job.FixedDepositProcessorJob" />
+
+	<context:component-scan base-package="sample.spring.chapter10.bankapp" /> 
+
+	<context:property-placeholder location="classpath*:META-INF/spring/*.properties" />
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="namedJdbcTemplate"
+		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg index="0" ref="dataSource" />
+	</bean>
+
+	<bean class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close" id="dataSource">
+		<property name="driverClassName" value="${database.driverClassName}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.username}" />
+		<property name="password" value="${database.password}" />
+	</bean>
+
+	<bean id="dbTxManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+</beans>

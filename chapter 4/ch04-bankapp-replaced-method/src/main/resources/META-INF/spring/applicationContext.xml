@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<bean id="service"
+		class="sample.spring.chapter04.bankapp.service.FixedDepositServiceImpl">
+		<property name="fixedDepositDao">
+			<bean class="sample.spring.chapter04.bankapp.dao.FixedDepositDaoImpl" />
+		</property>
+		<constructor-arg index="0"
+			value="META-INF/config/appConfig.properties" />
+	</bean>
+
+	<bean id="eventSenderSelectorService"
+		class="sample.spring.chapter04.bankapp.service.EventSenderSelectorServiceImpl">
+		<constructor-arg index="0"
+			value="META-INF/config/appConfig.properties" />
+	</bean>
+
+	<bean id="customerRequestService"
+		class="sample.spring.chapter04.bankapp.service.CustomerRequestServiceImpl">
+		<constructor-arg name="customerRequestDao" ref="customerRequestDao" />
+		<replaced-method name="getMyBean" replacer="methodReplacer" />
+	</bean>
+
+	<bean id="methodReplacer"
+		class="sample.spring.chapter04.bankapp.service.MyMethodReplacer" />
+
+	<bean id="customerRequestDetails"
+		class="sample.spring.chapter04.bankapp.domain.CustomerRequestDetails"
+		scope="prototype" />
+
+	<bean id="customerRequestDao"
+		class="sample.spring.chapter04.bankapp.dao.CustomerRequestDaoImpl" />
+
+	<bean id="customerRegistrationService"
+		class="sample.spring.chapter04.bankapp.service.CustomerRegistrationServiceImpl"
+		scope="prototype">
+		<constructor-arg name="customerRegistrationDetails"
+			ref="customerRegistrationDetails" />
+		<constructor-arg name="customerRegistrationDao" ref="customerRegistrationDao" />
+	</bean>
+
+	<bean id="customerRegistrationDetails"
+		class="sample.spring.chapter04.bankapp.domain.CustomerRegistrationDetails"
+		scope="prototype" />
+
+	<bean id="customerRegistrationDao"
+		class="sample.spring.chapter04.bankapp.dao.CustomerRegistrationDaoImpl" />
+</beans>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+	
+	<bean id="bankDetails" class="sample.spring.chapter03.beans.BankDetails">
+		<property name="bankName" value="My Personal Bank" />
+		<property name="bankPrimaryBusiness" value="Retail banking" />
+		<property name="headOfficeAddress" value="Address of head office" />
+		<property name="privateBank" value="Y" />
+		<property name="primaryCurrency" value="INR" />
+		<property name="dateOfInception" ref="dateType" />
+		<property name="branchAddresses" ref="branchAddresses" />
+	</bean>
+	
+	<util:property-path id="dateType" path="dataTypes.dateType" />
+ 
+	<util:properties id="branchAddresses"
+		location="classpath:META-INF/addresses.properties" />
+
+	<bean id="dataTypes" class="sample.spring.chapter03.beans.DataTypesExample">
+		<constructor-arg name="byteArrayType"
+			value="Getting started with the Spring Framework" />
+		<constructor-arg name="charType" value="\u0041" />
+		<constructor-arg name="charArray"
+			value="Getting started with the Spring Framework" />
+		<constructor-arg name="classType"
+			value="sample.spring.chapter03.beans.DataTypesExample" />
+		<constructor-arg name="currencyType" value="INR" />
+		<constructor-arg name="booleanType" ref="booleanTrue" />
+		<property name="dateType" value="30-01-2012" />
+		<constructor-arg name="longType" value="10" />
+		<constructor-arg name="doubleType" value="20" />
+		<constructor-arg name="propertiesType" ref="propertiesType" />
+		<constructor-arg name="anotherPropertiesType" ref="anotherPropertiesType" />
+		<constructor-arg name="listType" ref="listType" />
+		<constructor-arg name="mapType" ref="mapType" />
+		<constructor-arg name="setType" ref="setType" />
+	</bean>
+
+	<util:constant id="booleanTrue" static-field="java.lang.Boolean.TRUE" />
+	<util:properties id="propertiesType"
+		location="classpath:META-INF/sample1.properties" />
+	<util:properties id="anotherPropertiesType"
+		location="classpath:META-INF/sample2.properties" />
+	<util:list id="listType" list-class="java.util.ArrayList">
+		<value>A simple String value in list</value>
+		<value>Another simple String value in list</value>
+	</util:list>
+	<util:map id="mapType" map-class="java.util.TreeMap">
+		<entry key="map key 1" value="map key 1’s value" />
+	</util:map>
+	<util:set id="setType" set-class="java.util.HashSet">
+		<value>Element 1</value>
+		<value>Element 2</value>
+	</util:set>
+
+
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="propertyEditorRegistrars">
+			<list>
+				<bean class="sample.spring.chapter03.beans.MyPropertyRegistrar" />
+			</list>
+		</property>
+	</bean>
+</beans>

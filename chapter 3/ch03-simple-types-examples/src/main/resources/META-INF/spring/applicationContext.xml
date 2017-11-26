@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="bankDetails" class="sample.spring.chapter03.beans.BankDetails">
+		<property name="bankName" value="My Personal Bank" />
+		<property name="bankPrimaryBusiness" value="Retail banking" />
+		<property name="headOfficeAddress" value="Address of head office" />
+		<property name="privateBank" value="Y" />
+		<property name="primaryCurrency" value="INR" />
+		<property name="dateOfInception" value="30-01-2012"></property>
+		<property name="branchAddresses">
+			<value>
+				x = Branch X's address
+				y = Branch Y's address
+			</value>
+		</property>
+	</bean>
+
+	<bean id="dataTypes" class="sample.spring.chapter03.beans.DataTypesExample">
+		<constructor-arg name="byteArrayType"
+			value="Getting started with the Spring Framework" />
+		<constructor-arg name="charType" value="\u0041" />
+		<constructor-arg name="charArray"
+			value="Getting started with the Spring Framework" />
+		<constructor-arg name="classType"
+			value="sample.spring.chapter03.beans.DataTypesExample" />
+		<constructor-arg name="currencyType" value="INR" />
+		<constructor-arg name="booleanType" value="true" />
+		<constructor-arg name="dateType" value="30-01-2012" />
+		<constructor-arg name="longType" value="10" />
+		<constructor-arg name="doubleType" value="20" />
+		<constructor-arg name="propertiesType">
+			<value>
+				x = y
+				a = b
+			</value>
+		</constructor-arg>
+		<constructor-arg name="anotherPropertiesType">
+			<props>
+				<prop key="book">Getting started with the Spring Framework</prop>
+			</props>
+		</constructor-arg>
+		<constructor-arg name="listType">
+			<list>
+				<value >1</value>
+				<value>2</value>
+			</list>
+		</constructor-arg>
+		<constructor-arg name="mapType">
+			<map>
+				<entry>
+					<key>
+						<value>map key 1</value>
+					</key>
+					<value>map key 1’s value</value>
+				</entry>
+			</map>
+		</constructor-arg>
+		<constructor-arg name="setType">
+			<set>
+				<value>Element 1</value>
+				<value>Element 2</value>
+			</set>
+		</constructor-arg>
+	</bean>
+
+	<bean class="sample.spring.chapter03.beans.CollectionTypesExample">
+		<property name="listType">
+			<set>
+				<value>set element 1</value>
+				<value>set element 2</value>
+			</set>
+		</property>
+		<property name="setType">
+			<list>
+				<value>list element 1</value>
+				<value>list element 2</value>
+			</list>
+		</property>
+		<property name="mapType">
+			<map>
+				<entry>
+					<key>
+						<value>map key</value>
+					</key>
+					<value>map value</value>
+				</entry>
+			</map>
+		</property>
+	</bean>
+
+	<bean id="myPropertyEditorRegistrar" class="sample.spring.chapter03.beans.MyPropertyEditorRegistrar" />
+	<bean class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="propertyEditorRegistrars">
+			<list>
+				<ref bean="myPropertyEditorRegistrar"/>
+			</list>
+		</property>
+	</bean>
+</beans>

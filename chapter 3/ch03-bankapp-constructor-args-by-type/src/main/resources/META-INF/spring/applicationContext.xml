@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<bean id="daoTemplate" abstract="true">
+		<property name="databaseOperations" ref="databaseOperations" />
+	</bean>
+
+	<bean id="databaseOperations"
+		class="sample.spring.chapter03.bankapp.utils.DatabaseOperations" />
+
+	<bean id="serviceTemplate"
+		class="sample.spring.chapter03.bankapp.base.ServiceTemplate">
+		<constructor-arg ref="emailMessageSender" />
+		<constructor-arg ref="jmsMessageSender" />
+		<constructor-arg ref="webServiceInvoker" />
+	</bean>
+
+	<bean id="jmsMessageSender"
+		class="sample.spring.chapter03.bankapp.base.JmsMessageSender" />
+	<bean id="webServiceInvoker"
+		class="sample.spring.chapter03.bankapp.base.WebServiceInvoker" />
+	<bean id="emailMessageSender"
+		class="sample.spring.chapter03.bankapp.base.EmailMessageSender" />
+
+	<bean id="controllerFactory"
+		class="sample.spring.chapter03.bankapp.controller.ControllerFactory" />
+
+	<bean id="controllerTemplate" factory-bean="controllerFactory"
+		factory-method="getController" abstract="true">
+	</bean>
+
+	<bean id="fixedDepositcontroller" parent="controllerTemplate">
+		<constructor-arg index="0" value="fixedDepositController" />
+		<property name="fixedDepositService" ref="fixedDepositService" />
+	</bean>
+
+	<bean id="fixedDepositService"
+		class="sample.spring.chapter03.bankapp.service.FixedDepositServiceImpl"
+		parent="serviceTemplate">
+		<property name="fixedDepositDao" ref="fixedDepositDao" />
+	</bean>
+
+	<bean id="fixedDepositDao" parent="daoTemplate"
+		class="sample.spring.chapter03.bankapp.dao.FixedDepositDaoImpl" />
+
+	<bean id="fixedDepositDetails"
+		class="sample.spring.chapter03.bankapp.domain.FixedDepositDetails"
+		scope="prototype" />
+
+	<bean id="personalBankingController" parent="controllerTemplate">
+		<constructor-arg index="0" value="personalBankingController" />
+		<property name="personalBankingService" ref="personalBankingService" />
+	</bean>
+
+	<bean id="personalBankingService"
+		class="sample.spring.chapter03.bankapp.service.PersonalBankingServiceImpl"
+		parent="serviceTemplate">
+		<property name="personalBankingDao" ref="personalBankingDao" />
+	</bean>
+
+	<bean id="personalBankingDao" parent="daoTemplate"
+		class="sample.spring.chapter03.bankapp.dao.PersonalBankingDaoImpl" />
+
+	<bean id="userRequestController"
+		class="sample.spring.chapter03.bankapp.controller.UserRequestControllerImpl">
+		<constructor-arg index="0" ref="serviceTemplate" />
+	</bean>
+
+	<bean id="transferFundsService"
+		class="sample.spring.chapter03.bankapp.service.TransferFundsServiceImpl">
+		<constructor-arg type="java.lang.String" value="http://someUrl.com/xyz" />
+		<constructor-arg type="boolean" value="true" />
+		<constructor-arg type="int" value="5" />
+		<constructor-arg type="long" value="200" />
+	</bean>
+</beans>

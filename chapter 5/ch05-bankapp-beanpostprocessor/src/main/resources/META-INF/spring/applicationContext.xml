@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<bean id="fixedDepositService"
+		class="sample.spring.chapter05.bankapp.service.FixedDepositServiceImpl" />
+
+	<bean id="fixedDepositDao" class="sample.spring.chapter05.bankapp.dao.FixedDepositDaoImpl"
+		init-method="initializeDbConnection" destroy-method="releaseDbConnection" />
+
+	<bean
+		class="sample.spring.chapter05.bankapp.postprocessor.InstanceValidationBeanPostProcessor">
+		<property name="order" value="1" />
+	</bean>
+
+	<bean
+		class="sample.spring.chapter05.bankapp.postprocessor.DependencyResolutionBeanPostProcessor">
+		<property name="myApplicationContext" ref="myApplicationContext" />
+		<property name="order" value="0" />
+	</bean>
+
+	<bean id="myApplicationContext"
+		class="sample.spring.chapter05.bankapp.common.MyApplicationContext" />
+
+	<bean id="eventSenderFactory"
+		class="sample.spring.chapter05.bankapp.factory.EventSenderFactoryBean" />
+
+</beans>

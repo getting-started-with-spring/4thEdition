@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	 http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc.xsd  http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd ">
+
+	<mvc:annotation-driven conversion-service="myConversionService" />
+
+	<bean id="myConversionService"
+		class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<set>
+				<bean
+					class="sample.spring.chapter15.converter.IdToFixedDepositDetailsConverter" />
+			</set>
+		</property>
+		<property name="formatters">
+			<set>
+				<bean
+					class="sample.spring.chapter15.formatter.AmountFormatAnnotationFormatterFactory" />
+			</set>
+		</property>
+	</bean>
+
+	<context:component-scan base-package="sample.spring.chapter15.web" />
+
+	<bean id="viewResolver"
+		class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/jsp/" />
+		<property name="suffix" value=".jsp" />
+	</bean>
+
+	<mvc:interceptors>
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
+			<property name="paramName" value="lang" />
+		</bean>
+	</mvc:interceptors>
+
+	<bean class="org.springframework.web.servlet.i18n.CookieLocaleResolver"
+		id="localeResolver">
+		<property name="cookieName" value="mylocale" />
+	</bean>
+	<bean
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource"
+		id="messageSource">
+		<property name="basenames" value="WEB-INF/i18n/messages" />
+		<property name="cacheSeconds" value="10" />
+	</bean>
+
+</beans>

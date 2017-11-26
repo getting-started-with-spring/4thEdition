@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<authentication-manager>
+		<authentication-provider user-service-ref="userDetailsService" >
+			<password-encoder hash="bcrypt"/>
+		</authentication-provider>
+	</authentication-manager>
+
+	<beans:bean id="userDetailsService"
+		class="org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl">
+		<beans:property name="dataSource" ref="dataSource" />
+	</beans:bean>
+
+	<http>
+		<access-denied-handler error-page="/access-denied" />
+		<intercept-url pattern="/fixedDeposit/*"
+			access="hasAnyRole('ROLE_CUSTOMER', 'ROLE_ADMIN')" />
+		<form-login login-page="/login"
+			authentication-failure-handler-ref="authFailureHandler" />
+		<logout />
+		<headers>
+			<cache-control />
+			<xss-protection />
+		</headers>
+	</http>
+
+	<beans:bean id="authFailureHandler"
+		class="sample.spring.chapter16.security.MyAuthFailureHandler" />
+
+	<global-method-security pre-post-annotations="enabled">
+		<expression-handler ref="expressionHandler" />
+	</global-method-security>
+
+	<beans:bean id="expressionHandler"
+		class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler">
+		<beans:property name="permissionEvaluator" ref="permissionEvaluator" />
+		<beans:property name="permissionCacheOptimizer">
+			<beans:bean
+				class="org.springframework.security.acls.AclPermissionCacheOptimizer">
+				<beans:constructor-arg ref="aclService" />
+			</beans:bean>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="permissionEvaluator"
+		class="org.springframework.security.acls.AclPermissionEvaluator">
+		<beans:constructor-arg ref="aclService" />
+	</beans:bean>
+
+	<beans:bean id="aclCache"
+		class="org.springframework.security.acls.domain.EhCacheBasedAclCache">
+		<beans:constructor-arg>
+			<beans:bean class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+				<beans:property name="cacheManager">
+					<beans:bean
+						class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean" />
+				</beans:property>
+				<beans:property name="cacheName" value="aclCache" />
+			</beans:bean>
+		</beans:constructor-arg>
+		<beans:constructor-arg ref="aclAuthorizationStrategy" />
+		<beans:constructor-arg ref="permissionGrantingStrategy" />
+	</beans:bean>
+
+	<beans:bean id="lookupStrategy"
+		class="org.springframework.security.acls.jdbc.BasicLookupStrategy">
+		<beans:constructor-arg ref="dataSource" />
+		<beans:constructor-arg ref="aclCache" />
+		<beans:constructor-arg ref="aclAuthorizationStrategy" />
+		<beans:constructor-arg ref="permissionGrantingStrategy" />
+	</beans:bean>
+	
+	<beans:bean id="aclAuthorizationStrategy"
+		class="org.springframework.security.acls.domain.AclAuthorizationStrategyImpl">
+		<beans:constructor-arg>
+			<beans:bean
+				class="org.springframework.security.core.authority.SimpleGrantedAuthority">
+				<beans:constructor-arg value="ROLE_CUSTOMER" />
+			</beans:bean>
+		</beans:constructor-arg>
+	</beans:bean>
+	
+	<beans:bean id="permissionGrantingStrategy"
+		class="org.springframework.security.acls.domain.DefaultPermissionGrantingStrategy">
+		<beans:constructor-arg>
+			<beans:bean
+				class="org.springframework.security.acls.domain.ConsoleAuditLogger" />
+		</beans:constructor-arg>
+	</beans:bean>
+
+	<beans:bean id="aclService"
+		class="org.springframework.security.acls.jdbc.JdbcMutableAclService">
+		<beans:constructor-arg ref="dataSource" />
+		<beans:constructor-arg ref="lookupStrategy" />
+		<beans:constructor-arg ref="aclCache" />
+	</beans:bean>
+</beans:beans>

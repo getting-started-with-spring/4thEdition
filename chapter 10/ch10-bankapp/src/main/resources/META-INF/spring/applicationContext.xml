@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:amq="http://activemq.apache.org/schema/core" xmlns:jms="http://www.springframework.org/schema/jms"
+	xmlns:cache="http://www.springframework.org/schema/cache" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd  http://www.springframework.org/schema/tx
+         http://www.springframework.org/schema/tx/spring-tx.xsd 
+         http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd   
+         http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms.xsd
+         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd
+         http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<!-- 
+		AOP-based caching configuration
+	
+	<cache:advice id="cacheAdvice" cache-manager="myCacheManager">
+		<cache:caching cache="fixedDepositList">
+			<cache:cache-evict method="createFixedDeposit"
+				all-entries="true" before-invocation="true" />
+			<cache:cacheable method="findFixedDepositsByBankAccount" />
+		</cache:caching>
+		<cache:caching cache="fixedDeposit">
+			<cache:cache-put method="getFixedDeposit" key="#fixedDepositId" />
+			<cache:cacheable method="getFixedDepositFromCache"
+				key="#fixedDepositId" />
+		</cache:caching>
+	</cache:advice>
+
+	<aop:config>
+		<aop:advisor advice-ref="cacheAdvice"
+			pointcut="execution(* sample.spring.chapter10.bankapp.service.FixedDepositService.*(..))" />
+	</aop:config>
+ 	-->
+	<cache:annotation-driven cache-manager="myCacheManager"/>
+	
+	<bean id="myCacheManager" class="org.springframework.cache.support.SimpleCacheManager">
+		<property name="caches">
+			<set>
+				<bean
+					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean">
+					<property name="name" value="fixedDepositList" />
+				</bean>
+				<bean
+					class="org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean">
+					<property name="name" value="fixedDeposit" />
+				</bean>
+			</set>
+		</property>
+	</bean>
+
+	<tx:annotation-driven />
+
+	<!-- embedded ActiveMQ broker configuration -->
+	<amq:broker>
+		<amq:transportConnectors>
+			<amq:transportConnector uri="tcp://localhost:61616" />
+		</amq:transportConnectors>
+	</amq:broker>
+
+	<!-- JMS ConnectionFactory configuration -->
+	<amq:connectionFactory brokerURL="vm://localhost"
+		id="jmsFactory">
+		<amq:trustedPackages>
+			<value>sample.spring.chapter10.bankapp.domain</value>
+			<value>java.util</value>
+		</amq:trustedPackages>
+	</amq:connectionFactory>
+
+	<!-- JMS ConnectionFactory that caches JMS Sessions, MessageProducers and 
+		MessageConsumers -->
+	<bean class="org.springframework.jms.connection.CachingConnectionFactory"
+		id="cachingConnectionFactory">
+		<property name="targetConnectionFactory" ref="jmsFactory" />
+	</bean>
+
+	<bean class="org.springframework.jms.core.JmsTemplate" id="jmsTemplate">
+		<property name="connectionFactory" ref="cachingConnectionFactory" />
+		<property name="defaultDestination" ref="fixedDepositDestination" />
+	</bean>
+
+	<!-- Configure JMS destination queues -->
+	<amq:queue id="fixedDepositDestination" physicalName="aQueueDestination" />
+	<amq:queue id="emailQueueDestination" physicalName="emailQueueDestination" />
+
+	<jms:listener-container connection-factory="cachingConnectionFactory"
+		destination-type="queue" transaction-manager="jmsTxManager">
+		<jms:listener destination="aQueueDestination" ref="fixedDepositMessageListener" />
+		<jms:listener destination="emailQueueDestination" ref="emailMessageListener" />
+	</jms:listener-container>
+
+	<bean class="sample.spring.chapter10.bankapp.jms.EmailMessageListener"
+		id="emailMessageListener" />
+
+	<bean class="sample.spring.chapter10.bankapp.jms.FixedDepositMessageListener"
+		id="fixedDepositMessageListener" />
+
+	<bean class="org.springframework.mail.javamail.JavaMailSenderImpl"
+		id="mailSender">
+		<property name="host" value="${email.host}" />
+		<property name="protocol" value="${email.protocol}" />
+		<property name="port" value="${email.port}" />
+		<property name="username" value="${email.username}" />
+		<property name="password" value="${email.password}" />
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.starttls.enable">true</prop>
+			</props>
+		</property>
+	</bean>
+
+	<task:scheduled-tasks scheduler="emailScheduler">
+		<task:scheduled ref="fixedDepositProcessorJob" method="sendEmail"
+			fixed-rate="5000" />
+	</task:scheduled-tasks>
+
+	<bean id="fixedDepositProcessorJob"
+		class="sample.spring.chapter10.bankapp.job.FixedDepositProcessorJob" />
+
+	<task:scheduler id="emailScheduler" pool-size="10" />
+
+	<bean class="org.springframework.mail.SimpleMailMessage" id="requestReceivedTemplate">
+		<property name="subject" value="${email.subject.request.received}" />
+		<property name="text" value="${email.text.request.received}" />
+	</bean>
+
+	<bean class="org.springframework.mail.SimpleMailMessage" id="requestProcessedTemplate">
+		<property name="subject" value="${email.subject.request.processed}" />
+		<property name="text" value="${email.text.request.processed}" />
+	</bean>
+
+	<context:component-scan base-package="sample.spring.chapter10.bankapp" />
+
+	<context:property-placeholder location="classpath*:META-INF/spring/*.properties" />
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="namedJdbcTemplate"
+		class="org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate">
+		<constructor-arg index="0" ref="dataSource" />
+	</bean>
+
+	<bean class="org.apache.commons.dbcp2.BasicDataSource"
+		destroy-method="close" id="dataSource">
+		<property name="driverClassName" value="${database.driverClassName}" />
+		<property name="url" value="${database.url}" />
+		<property name="username" value="${database.username}" />
+		<property name="password" value="${database.password}" />
+	</bean>
+
+	<bean id="dbTxManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="jmsTxManager"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="cachingConnectionFactory" />
+	</bean>
+</beans>

@@ -1,0 +1,9 @@
+package sample.spring.chapter07.bankapp.service;
+
+import java.util.Date;
+
+import sample.spring.chapter07.bankapp.domain.AccountStatement;
+
+public interface AccountStatementService {
+	AccountStatement getAccountStatement(Date from, Date to);
+}

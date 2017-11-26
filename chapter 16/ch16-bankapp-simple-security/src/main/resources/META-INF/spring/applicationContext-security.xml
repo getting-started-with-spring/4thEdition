@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+	xmlns:beans="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/security
+           http://www.springframework.org/schema/security/spring-security.xsd">
+
+	<http>
+		<intercept-url pattern="/**"
+			access="hasAnyRole('ROLE_CUSTOMER', 'ROLE_ADMIN')" />
+		<form-login />
+		<logout />
+		<remember-me />
+		<headers>
+			<cache-control />
+			<xss-protection />
+		</headers>
+	</http>
+
+	<authentication-manager>
+		<authentication-provider>
+			<password-encoder hash="bcrypt" />
+			<user-service>
+				<user name="admin" password="$2a$10$GL3WYjTbs5zlsAQrZU8BlOiKfOXaUulHA.G9.lk5/OA6EHuYQuvty" authorities="ROLE_ADMIN" />
+				<user name="cust1" password="$2a$10$xlmAHNLJXuZ1cdDloeqXCubD2Nsnw0k206hqccZ1gh1.VTCD2Scw2" authorities="ROLE_CUSTOMER" />
+				<user name="cust2" password="$2a$10$dcsvRkVmeQXig1UBiXdpS.X5N5osA/XPyflAatK5Oac2dfPrTTDOW" authorities="ROLE_CUSTOMER" />
+			</user-service>
+		</authentication-provider>
+	</authentication-manager>
+
+	<global-method-security secured-annotations="enabled" />
+</beans:beans>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context 
+        http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<context:component-scan base-package="sample.spring" />
+	
+	<bean id="sampleAspect"
+		class="sample.spring.chapter11.bankapp.aspects.SampleAspect" />
+		
+	<aop:config proxy-target-class="false" expose-proxy="true">
+		
+		<aop:pointcut expression="execution(* sample.spring..*Service.*(..))"
+			id="services" />
+		<aop:aspect id="sampleAspect" ref="sampleAspect">
+			<aop:after-returning method="afterReturningAdvice"
+				returning="aValue"
+				pointcut="execution(* sample.spring..BankAccountService.createBankAccount(..))" />
+			<aop:after-throwing method="afterThrowingAdvice"
+				throwing="exception" pointcut="execution(* sample.spring..FixedDepositService.*(..))" />
+			<aop:after method="afterAdvice"
+				pointcut="execution(* sample.spring..BankAccountService.createBankAccount(..)) || execution(* sample.spring..FixedDepositService.*(..))" />
+			<aop:around method="aroundAdvice"
+				pointcut-ref="services"/>
+		</aop:aspect>
+		
+	</aop:config>
+
+</beans>

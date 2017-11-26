@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd">
+
+	<bean id="daoTemplate" abstract="true">
+		<property name="databaseOperations" ref="databaseOperations" />
+	</bean>
+
+	<bean id="databaseOperations"
+		class="sample.spring.chapter03.bankapp.utils.DatabaseOperations" />
+
+	<bean id="fixedDepositcontroller"
+		class="sample.spring.chapter03.bankapp.controller.FixedDepositControllerImpl">
+		<property name="fixedDepositService" ref="fixedDepositService" />
+	</bean>
+
+	<bean id="fixedDepositService"
+		class="sample.spring.chapter03.bankapp.service.FixedDepositServiceImpl">
+		<property name="fixedDepositDao" ref="fixedDepositDao" />
+	</bean>
+
+	<bean id="fixedDepositDao" parent="daoTemplate"
+		class="sample.spring.chapter03.bankapp.dao.FixedDepositDaoImpl" />
+
+	<bean id="fixedDepositDetails"
+		class="sample.spring.chapter03.bankapp.domain.FixedDepositDetails"
+		scope="prototype" />
+
+	<bean id="personalBankingController"
+		class="sample.spring.chapter03.bankapp.controller.PersonalBankingControllerImpl">
+		<property name="personalBankingService" ref="personalBankingService" />
+	</bean>
+
+	<bean id="personalBankingService"
+		class="sample.spring.chapter03.bankapp.service.PersonalBankingServiceImpl">
+		<property name="personalBankingDao" ref="personalBankingDao" />
+	</bean>
+
+	<bean id="personalBankingDao" parent="daoTemplate"
+		class="sample.spring.chapter03.bankapp.dao.PersonalBankingDaoImpl" />
+
+</beans>

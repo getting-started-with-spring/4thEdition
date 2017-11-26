@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="customerRequestService"
+		class="sample.spring.chapter04.bankapp.service.CustomerRequestServiceImpl"
+		autowire="constructor">
+	</bean>
+
+	<bean id="customerRequestDetails"
+		class="sample.spring.chapter04.bankapp.domain.CustomerRequestDetails"
+		scope="prototype" />
+
+	<bean id="customerRequestDao"
+		class="sample.spring.chapter04.bankapp.dao.CustomerRequestDaoImpl" />
+
+	<bean id="customerRegistrationService"
+		class="sample.spring.chapter04.bankapp.service.CustomerRegistrationServiceImpl"
+		scope="prototype" autowire="byType" />
+
+	<bean id="customerRegistrationService_"
+		class="sample.spring.chapter04.bankapp.service.CustomerRegistrationServiceImpl"
+		scope="prototype" autowire="no" />
+
+	<bean id="customerRegistrationDetails"
+		class="sample.spring.chapter04.bankapp.domain.CustomerRegistrationDetails"
+		scope="prototype" />
+
+	<bean id="customerRegistrationDao"
+		class="sample.spring.chapter04.bankapp.dao.CustomerRegistrationDaoImpl" />
+
+	<bean id="fixedDepositService"
+		class="sample.spring.chapter04.bankapp.service.FixedDepositServiceImpl"
+		autowire="byName" />
+
+	<bean id="myFixedDepositDao"
+		class="sample.spring.chapter04.bankapp.dao.FixedDepositDaoImpl" />
+
+	<bean id="accountStatementService"
+		class="sample.spring.chapter04.bankapp.service.AccountStatementServiceImpl"
+		autowire="byType" />
+
+	<bean id="accountStatementDao"
+		class="sample.spring.chapter04.bankapp.dao.AccountStatementDaoImpl"
+		autowire-candidate="false" />
+</beans>
