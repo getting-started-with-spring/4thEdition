@@ -8,11 +8,11 @@ import io.reactivex.FlowableSubscriber;
 
 public class HeartbeatSubscriber implements FlowableSubscriber<Integer> {
 	private static Logger logger = LogManager.getLogger(HeartbeatSubscriber.class);
-	private final int targetHearbeatRate;
+	private final int targetHeartbeatRate;
 	private Subscription subscription;
 
-	public HeartbeatSubscriber(int targetHearbeatRate) {
-		this.targetHearbeatRate = targetHearbeatRate;
+	public HeartbeatSubscriber(int targetHeartbeatRate) {
+		this.targetHeartbeatRate = targetHeartbeatRate;
 	}
 
 	@Override
@@ -24,7 +24,7 @@ public class HeartbeatSubscriber implements FlowableSubscriber<Integer> {
 	@Override
 	public void onNext(Integer t) {
 		logger.info("Heartbeat --> " + t);
-		if (t >= targetHearbeatRate) {
+		if (t >= targetHeartbeatRate) {
 			logger.info("Alert !! " + t);
 			subscription.cancel();
 		}
