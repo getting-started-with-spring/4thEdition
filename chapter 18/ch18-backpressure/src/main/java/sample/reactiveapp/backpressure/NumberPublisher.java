@@ -30,7 +30,7 @@ public class NumberPublisher {
 	private static FlowableOnSubscribe<Integer> flowableOnSubscribe = new FlowableOnSubscribe<Integer>() {
 		public void subscribe(FlowableEmitter<Integer> emitter)
 				throws InterruptedException {
-			logger.info("FlowableOnSubscriber's subscribe method called");
+			logger.info("FlowableOnSubscribe's subscribe method called");
 			int count = 1;
 			while (count < Integer.MAX_VALUE) {
 				emitter.onNext(count++);
